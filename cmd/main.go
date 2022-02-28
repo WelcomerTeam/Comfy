@@ -39,6 +39,8 @@ func main() {
 	stanCluster := flag.String("stanCluster", os.Getenv("STAN_CLUSTER"), "NATs Streaming Cluster")
 	stanChannel := flag.String("stanChannel", os.Getenv("STAN_CHANNEL"), "NATs Streaming Channel")
 
+	dryRun := flag.Bool("dryRun", false, "When enabled, bot will exit once all bots and cogs have been setup")
+
 	flag.Parse()
 
 	// Default flag values
@@ -96,6 +98,11 @@ func main() {
 	sandwichClient := sandwich.NewSandwich(grpcConnection, restInterface, writer)
 
 	sandwichClient.RegisterBot(comfyBotIdentifier, comfy.NewComfy(comfyBotIdentifier, sandwichClient))
+
+	// We return if it a dry run. Any issues loading up the bot would've already caused a panic.
+	if *dryRun {
+		return
+	}
 
 	// Signal
 	signalCh := make(chan os.Signal, 1)
